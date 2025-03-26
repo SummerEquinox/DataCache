@@ -39,26 +39,28 @@
     Your other folders in Network do not matter.
 ]]
 
+--!strict
+
 -- Types
 type Data = { [any]: any } | {}
 type DataCache = {
 	_initialized: boolean,
 	_data: Data,
-	_methods: { [string]: (any...) -> any... } | {},
+	_methods: { [string]: (...any) -> (...any) },
 
-	public_methods: { [string]: (any...) -> any... } | {},
+	public_methods: { [string]: (...any) -> (...any) },
 }
 
 -- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- Constants
-local DATA_CACHE_NETWORK_ROOT: Folder = ReplicatedStorage:WaitForChild("Network"):WaitForChild("DataCache")
+local DATA_CACHE_NETWORK_ROOT = ReplicatedStorage:WaitForChild("Network"):WaitForChild("DataCache")
 
-local NETWORK_FUNCTIONS: Folder = DATA_CACHE_NETWORK_ROOT:WaitForChild("Functions")
-local NETWORK_EVENTS: Folder = DATA_CACHE_NETWORK_ROOT:WaitForChild("Events")
+local NETWORK_FUNCTIONS = DATA_CACHE_NETWORK_ROOT:WaitForChild("Functions")
+local NETWORK_EVENTS = DATA_CACHE_NETWORK_ROOT:WaitForChild("Events") 
 
-local INITIALIZED_SIGNAL: BindableEvent = Instance.new("BindableEvent", script)
+local INITIALIZED_SIGNAL = Instance.new("BindableEvent", script)
 
 -- Variables
 local currentlyInitializing: boolean = false
@@ -93,7 +95,7 @@ function DataCache._methods:Initialize()
 
     currentlyInitializing = true
 
-    local data = NETWORK_FUNCTIONS.RequestDataCache:InvokeServer()
+	local data = NETWORK_FUNCTIONS.RequestDataCache:InvokeServer()
 
     NETWORK_EVENTS.DataCacheUpdatedFull.OnClientEvent:Connect(onDataCacheUpdatedFull)
     NETWORK_EVENTS.DataCacheUpdatedPartial.OnClientEvent:Connect(onDataCacheUpdatedPartial)
@@ -103,7 +105,7 @@ function DataCache._methods:Initialize()
 
     currentlyInitializing = false
 
-    INITIALIZED_SIGNAL:Fire()
+	INITIALIZED_SIGNAL:Fire()
 end
 
 function DataCache._methods:GetDataFull(): Data
