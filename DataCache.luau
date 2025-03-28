@@ -86,7 +86,7 @@ local DataCache: DataCache = {
 	},
 }
 
--- Cache Methods
+-- Cache Private Methods
 function DataCache.private._methods.initialize(self: DataCache)
 	local data = NETWORK_FUNCTIONS.RequestDataCache:InvokeServer()
 
@@ -118,7 +118,7 @@ function DataCache.private._methods.getDataPartial(self: DataCache, requestedDat
 	return data
 end
 
--- Public Method Writing
+-- Cache Public Methods
 function DataCache.public.getDataFull(self: DataCache): Data
 	return DataCache.private._methods:getDataFull()
 end
