@@ -41,14 +41,15 @@
 
 --!strict
 
--- Types
+-- Explicit Types
 type Data = { [any]: any } | {}
 type DataCache = {
-	_initialized: boolean,
-	_data: Data,
-	_methods: { [string]: (...any) -> (...any) },
-
-	public_methods: { [string]: (...any) -> (...any) },
+	public: { [string]: (...any) -> ...any },
+	private: {
+		_initialized: boolean,
+		_data: Data,
+		_methods: { [string]: (...any) -> ...any },
+	},
 }
 
 -- Services
@@ -58,84 +59,73 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DATA_CACHE_NETWORK_ROOT = ReplicatedStorage:WaitForChild("Network"):WaitForChild("DataCache")
 
 local NETWORK_FUNCTIONS = DATA_CACHE_NETWORK_ROOT:WaitForChild("Functions")
-local NETWORK_EVENTS = DATA_CACHE_NETWORK_ROOT:WaitForChild("Events") 
-
-local INITIALIZED_SIGNAL = Instance.new("BindableEvent", script)
+local NETWORK_EVENTS = DATA_CACHE_NETWORK_ROOT:WaitForChild("Events")
 
 -- Variables
-local currentlyInitializing: boolean = false
+local currentlyInitializing = false
+
+-- Functions
+function onDataCacheUpdatedFull(dataCachePrivate, fullDataset: Data)
+	dataCachePrivate._data = fullDataset
+end
+
+function onDataCacheUpdatedPartial(dataCachePrivate, dataKey: string, dataValue: any)
+	dataCachePrivate._data[dataKey] = dataValue
+end
 
 -- Cache
 local DataCache: DataCache = {
-	_initialized = false,
-	_data = {},
-	_methods = {},
-
-	public_methods = {},
+	public = {},
+	private = {
+		_initialized = false,
+		_data = {},
+		_methods = {},
+	},
 }
 
--- Functions
-function onDataCacheUpdatedFull(data: Data)
-    DataCache._data = data
-end
-
-function onDataCacheUpdatedPartial(dataKey: string, data: any)
-    DataCache._data[dataKey] = data
-end
-
--- Method Writing
-function DataCache._methods:Initialize()
-    if currentlyInitializing then
-        INITIALIZED_SIGNAL.Event:Wait()
-    end
-
-	if DataCache._initialized then
-		return
-	end
-
-    currentlyInitializing = true
-
+-- Cache Methods
+function DataCache.private._methods:initialize()
 	local data = NETWORK_FUNCTIONS.RequestDataCache:InvokeServer()
 
-    NETWORK_EVENTS.DataCacheUpdatedFull.OnClientEvent:Connect(onDataCacheUpdatedFull)
-    NETWORK_EVENTS.DataCacheUpdatedPartial.OnClientEvent:Connect(onDataCacheUpdatedPartial)
+	NETWORK_EVENTS.DataCacheUpdatedFull.OnClientEvent:Connect(function(incomingDataFull: Data)
+		onDataCacheUpdatedFull(DataCache.private, incomingDataFull)
+	end)
 
-    DataCache._initialized = true
-    DataCache._data = data
+	NETWORK_EVENTS.DataCacheUpdatedPartial.OnClientEvent:Connect(
+		function(incomingDataKey: string, incomingDataValue: any)
+			onDataCacheUpdatedPartial(DataCache.private, incomingDataKey, incomingDataValue)
+		end
+	)
 
-    currentlyInitializing = false
-
-	INITIALIZED_SIGNAL:Fire()
+	DataCache.private._initialized = true
+	DataCache.private._data = data
 end
 
-function DataCache._methods:GetDataFull(): Data
-    DataCache._methods:Initialize()
-    return DataCache._data
+function DataCache.private._methods:getDataFull(): Data
+	return DataCache.private._data
 end
 
-function DataCache._methods:GetDataPartial(dataKey: string, returnEmptyTableIfNotFound: boolean?): Data | any | nil
-    local data = DataCache._data[dataKey]
+function DataCache.private._methods:getDataPartial(requestedDataKey: string, returnEmptyTableIfNotFound: boolean?): any
+	local data = DataCache.private._data[requestedDataKey]
 
-    if data == nil and returnEmptyTableIfNotFound then
-        return {}
-    end
+	if data == nil and returnEmptyTableIfNotFound then
+		return {}
+	end
 
-    return data
+	return data
 end
 
 -- Public Method Writing
-function DataCache.public_methods:GetDataFull(): Data
-	DataCache._methods:Initialize()
-    return DataCache._methods:GetDataFull()
+function DataCache.public:getDataFull(): Data
+	return DataCache.private._methods:getDataFull()
 end
 
-function DataCache.public_methods:GetDataPartial(dataKey: string, returnEmptyTableIfNotFound: boolean?): Data | any | nil
-	DataCache._methods:Initialize()
-    return DataCache._methods:GetDataPartial(dataKey, returnEmptyTableIfNotFound)
+function DataCache.public:getDataPartial(dataKey: string, returnEmptyTableIfNotFound: boolean?): any
+	return DataCache.private._methods:getDataPartial(dataKey, returnEmptyTableIfNotFound)
 end
 
 -- Initialize
-DataCache._methods:Initialize()
+DataCache.private._methods:initialize()
 
 -- Return Cache
-return DataCache.public_methods
+return DataCache.public
