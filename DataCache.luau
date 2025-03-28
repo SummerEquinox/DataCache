@@ -86,7 +86,17 @@ local DataCache: DataCache = {
 	},
 }
 
--- Cache Private Methods
+-- Cache Methods
+
+--[[
+Description: Initializes the DataCache by requesting initial data from the server and setting up event listeners for data updates.
+
+Parameters:
+    self: DataCache - The DataCache instance
+
+Returns:
+    None
+]]
 function DataCache.private._methods.initialize(self: DataCache)
 	local data = NETWORK_FUNCTIONS.RequestDataCache:InvokeServer()
 
@@ -104,10 +114,30 @@ function DataCache.private._methods.initialize(self: DataCache)
 	DataCache.private._data = data
 end
 
+--[[
+Description: Retrieves the complete dataset stored in the DataCache.
+
+Parameters:
+    self: DataCache - The DataCache instance
+
+Returns:
+    Data - The complete dataset stored in the cache
+]]
 function DataCache.private._methods.getDataFull(self: DataCache): Data
 	return DataCache.private._data
 end
 
+--[[
+Description: Retrieves a specific portion of data from the DataCache by key.
+
+Parameters:
+    self: DataCache - The DataCache instance
+    requestedDataKey: string - The key of the data to retrieve
+    returnEmptyTableIfNotFound: boolean? - Optional parameter to return an empty table if the key is not found
+
+Returns:
+    any - The requested data value or an empty table if not found and returnEmptyTableIfNotFound is true
+]]
 function DataCache.private._methods.getDataPartial(self: DataCache, requestedDataKey: string, returnEmptyTableIfNotFound: boolean?): any
 	local data = DataCache.private._data[requestedDataKey]
 
@@ -118,11 +148,30 @@ function DataCache.private._methods.getDataPartial(self: DataCache, requestedDat
 	return data
 end
 
--- Cache Public Methods
+--[[
+Description: Public method to retrieve the complete dataset stored in the DataCache.
+
+Parameters:
+    self: DataCache - The DataCache instance
+
+Returns:
+    Data - The complete dataset stored in the cache
+]]
 function DataCache.public.getDataFull(self: DataCache): Data
 	return DataCache.private._methods:getDataFull()
 end
 
+--[[
+Description: Public method to retrieve a specific portion of data from the DataCache by key.
+
+Parameters:
+    self: DataCache - The DataCache instance
+    dataKey: string - The key of the data to retrieve
+    returnEmptyTableIfNotFound: boolean? - Optional parameter to return an empty table if the key is not found
+
+Returns:
+    any - The requested data value or an empty table if not found and returnEmptyTableIfNotFound is true
+]]
 function DataCache.public.getDataPartial(self: DataCache, dataKey: string, returnEmptyTableIfNotFound: boolean?): any
 	return DataCache.private._methods:getDataPartial(dataKey, returnEmptyTableIfNotFound)
 end
