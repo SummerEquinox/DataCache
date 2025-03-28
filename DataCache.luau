@@ -4,6 +4,9 @@
 -- This file is not currently hosted on Wally.
 -- Repository: https://github.com/SummerEquinox/DataCache
 
+-- For contributions and PRs, note that the file is wrote using the Roblox Lua Style Guide:
+-- https://roblox.github.io/lua-style-guide/
+
 --[[
     DataCache is a lightweight unit-ified cache of the data for the LocalPlayer.
 
@@ -65,11 +68,11 @@ local NETWORK_EVENTS = DATA_CACHE_NETWORK_ROOT:WaitForChild("Events")
 local currentlyInitializing = false
 
 -- Functions
-function onDataCacheUpdatedFull(dataCachePrivate, fullDataset: Data)
+local function onDataCacheUpdatedFull(dataCachePrivate, fullDataset: Data)
 	dataCachePrivate._data = fullDataset
 end
 
-function onDataCacheUpdatedPartial(dataCachePrivate, dataKey: string, dataValue: any)
+local function onDataCacheUpdatedPartial(dataCachePrivate, dataKey: string, dataValue: any)
 	dataCachePrivate._data[dataKey] = dataValue
 end
 
@@ -84,7 +87,7 @@ local DataCache: DataCache = {
 }
 
 -- Cache Methods
-function DataCache.private._methods:initialize()
+function DataCache.private._methods.initialize(self: DataCache)
 	local data = NETWORK_FUNCTIONS.RequestDataCache:InvokeServer()
 
 	NETWORK_EVENTS.DataCacheUpdatedFull.OnClientEvent:Connect(function(incomingDataFull: Data)
@@ -101,11 +104,11 @@ function DataCache.private._methods:initialize()
 	DataCache.private._data = data
 end
 
-function DataCache.private._methods:getDataFull(): Data
+function DataCache.private._methods.getDataFull(self: DataCache): Data
 	return DataCache.private._data
 end
 
-function DataCache.private._methods:getDataPartial(requestedDataKey: string, returnEmptyTableIfNotFound: boolean?): any
+function DataCache.private._methods.getDataPartial(self: DataCache, requestedDataKey: string, returnEmptyTableIfNotFound: boolean?): any
 	local data = DataCache.private._data[requestedDataKey]
 
 	if data == nil and returnEmptyTableIfNotFound then
@@ -116,11 +119,11 @@ function DataCache.private._methods:getDataPartial(requestedDataKey: string, ret
 end
 
 -- Public Method Writing
-function DataCache.public:getDataFull(): Data
+function DataCache.public.getDataFull(self: DataCache): Data
 	return DataCache.private._methods:getDataFull()
 end
 
-function DataCache.public:getDataPartial(dataKey: string, returnEmptyTableIfNotFound: boolean?): any
+function DataCache.public.getDataPartial(self: DataCache, dataKey: string, returnEmptyTableIfNotFound: boolean?): any
 	return DataCache.private._methods:getDataPartial(dataKey, returnEmptyTableIfNotFound)
 end
 
