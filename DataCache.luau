@@ -64,9 +64,6 @@ local DATA_CACHE_NETWORK_ROOT = ReplicatedStorage:WaitForChild("Network"):WaitFo
 local NETWORK_FUNCTIONS = DATA_CACHE_NETWORK_ROOT:WaitForChild("Functions")
 local NETWORK_EVENTS = DATA_CACHE_NETWORK_ROOT:WaitForChild("Events")
 
--- Variables
-local currentlyInitializing = false
-
 -- Functions
 local function onDataCacheUpdatedFull(dataCachePrivate, fullDataset: Data)
 	dataCachePrivate._data = fullDataset
