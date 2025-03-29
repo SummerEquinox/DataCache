@@ -44,7 +44,7 @@
 
 --!strict
 
--- Explicit Types
+-- In-File Types
 type Data = { [any]: any } | {}
 type DataCache = {
 	public: { [string]: (...any) -> ...any },
