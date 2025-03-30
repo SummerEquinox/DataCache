@@ -1,5 +1,6 @@
 [package]
 name = "summerequinox/datacache"
-version = "1.0.1"
+description = "DataCache is a strictly-typed, privacy-driven, lightweight cache of data for the LocalPlayer."
+version = "1.0.2"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
