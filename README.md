@@ -1,3 +1,5 @@
+![image](https://github.com/user-attachments/assets/e3d80b44-69b6-430a-b232-3170467280d3)
+
 # DataCache - lightweight & private client data
 
 DataCache is a strictly-typed, privacy-driven, lightweight cache of data for the LocalPlayer.
