@@ -24,8 +24,8 @@ DataCache is part of a series of packages I have developed personally for usage 
 ]]
 ```
 
-#### Addressing Wally
-This package is not currently hosted on Wally. I may host it in the future.
+#### Wally
+`datacache = "summerequinox/datacache@1.0.1"`
 
 #### API
 Publically, two methods are directly returned by the package (which can be thought of like a singleton of cached data, internals are held in a private table that is inaccessible externally).

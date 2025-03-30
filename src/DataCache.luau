@@ -1,8 +1,5 @@
--- SummerEquinox
--- DataCache.luau
-
--- This file is not currently hosted on Wally.
 -- Repository: https://github.com/SummerEquinox/DataCache
+-- Wally: https://wally.run/package/summerequinox/datacache
 
 -- For contributions and PRs, note that the file is wrote using the Roblox Lua Style Guide:
 -- https://roblox.github.io/lua-style-guide/
